@@ -81,6 +81,10 @@ h1 {
     font-size: 33px;
 }
 
+.deck .card.error {
+    background: red;
+}
+
 /*
  * Styles for the Score Panel
  */
@@ -107,3 +111,31 @@ h1 {
     float: right;
     cursor: pointer;
 }
+
+.hidden {
+    display: none;
+}
+
+/*
+ * Styles for the Winning modal 
+ */
+
+ .modal {
+     margin: auto;
+     text-align: center;
+     padding: 40px;
+ }
+
+ .check-mark {
+     width: 40px;
+     height: 40px;
+ }
+
+ .btn {
+     background-color: #02ccba;
+     color: #fff;
+     height: 32px;
+     width: 96px;
+     border: 0;
+     margin: 8px;
+ }

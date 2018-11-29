@@ -1,7 +1,13 @@
 /*
  * Create a list that holds all of your cards
  */
+let cards = ['fa-diamond', 'fa-paper-plane-o', 'fa-anchor', 'fa-bolt', 
+                'fa-cube', 'fa-anchor', 'fa-leaf', 'fa-bicycle', 'fa-diamond', 'fa-paper-plane-o', 
+                'fa-anchor', 'fa-bolt', 'fa-cube', 'fa-anchor', 'fa-leaf', 'fa-bicycle'];
 
+let matchCount = 0;
+let moveCount = 0;
+let stars = document.querySelectorAll('.stars .fa');
 
 /*
  * Display the cards on the page
@@ -36,3 +42,99 @@ function shuffle(array) {
  *    + increment the move counter and display it on the page (put this functionality in another function that you call from this one)
  *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
  */
+const deckEl = document.querySelector('.deck');
+let previousEl = null;
+deckEl.addEventListener('click', function(e){
+    const targetEl = e.target;
+    if (targetEl.classList.contains('card')) {
+        showCard(targetEl);
+    } else if (targetEl.classList.contains('fa')) {
+        showCard(targetEl.parentElement);
+    }   
+});
+
+function showCard(el) {
+    el.classList.add('open', 'show');
+    if (previousEl == null) {
+        previousEl = el;
+    } else {
+        const imageEl = getImageEl(el);
+        const previousImageEl = getImageEl(previousEl);
+        if (imageEl.className == previousImageEl.className && imageEl != previousImageEl) {
+            matchCard(el);
+            matchCard(previousEl); 
+            matchCount += 1;
+        } else {
+            errorCard(el);
+            errorCard(previousEl);
+        }
+        previousEl = null;
+        moveCount += 1;
+        document.querySelector('.moves').textContent = moveCount.toString();
+        document.querySelector('#move-count').textContent = moveCount.toString();
+        if (moveCount > 20) {
+            stars[0].classList.add('fa-star-o');
+            stars[0].classList.remove('fa-star');           
+        } else if (moveCount > 15) {
+            stars[1].classList.add('fa-star-o');
+            stars[1].classList.remove('fa-star');
+        } else if (moveCount > 10) {
+            stars[2].classList.add('fa-star-o');
+            stars[2].classList.remove('fa-star');
+        }
+        if (matchCount == 8) {
+            document.querySelector('#winModal').classList.remove('hidden');
+            document.querySelector('#game').classList.add('hidden');
+            document.querySelector('#star-rating').textContent = document.querySelectorAll('.stars .fa-star').length;
+        }
+    }
+}
+
+function hideCard(el) {
+    el.classList.remove('open', 'show', 'error');
+}
+
+function errorCard(el) {
+    el.classList.add('error');
+    setTimeout(function() {
+      hideCard(el);
+    }, 100)
+}      
+
+function matchCard(el) {
+    el.classList.add('match');
+}
+
+function getImageEl(el) {
+    return el.querySelector('.fa');
+}
+
+function restart() {
+    previousEl = null;
+    matchCount = 0;
+    moveCount = 0;
+    document.querySelector('#winModal').classList.add('hidden');
+    document.querySelector('#game').classList.remove('hidden');
+    document.querySelector('.moves').textContent = moveCount.toString();
+    stars[0].classList.remove('fa-star-o');
+    stars[0].classList.add('fa-star'); 
+    stars[1].classList.remove('fa-star-o');
+    stars[1].classList.add('fa-star'); 
+    stars[2].classList.remove('fa-star-o');
+    stars[2].classList.add('fa-star'); 
+
+    const shuffledCards = shuffle(cards);
+    const cardEls = document.querySelectorAll('.deck .card');
+    for (let i = 0; i < cardEls.length; i++) {
+        cardEls[i].className = 'card';
+        getImageEl(cardEls[i]).className = 'fa ' + shuffledCards[i];
+    }
+}
+
+const restartBtn = document.querySelector('.restart');
+restartBtn.addEventListener('click', restart);
+restart();
+
+
+const playAgainBtn = document.querySelector('.btn');
+playAgainBtn.addEventListener('click', restart);
