@@ -9,6 +9,12 @@ let matchCount = 0;
 let moveCount = 0;
 let stars = document.querySelectorAll('.stars .fa');
 
+/* timer functionality */
+var timer = new Timer();
+timer.addEventListener('secondsUpdated', function (e) {
+    document.querySelector('#game-timer').textContent = timer.getTimeValues().toString();
+});
+
 /*
  * Display the cards on the page
  *   - shuffle the list of cards using the provided "shuffle" method below
@@ -53,7 +59,12 @@ deckEl.addEventListener('click', function(e){
     }   
 });
 
+/* display the card's symbol */
+
 function showCard(el) {
+    if (!timer.isRunning()) {
+        timer.start();
+    }
     el.classList.add('open', 'show');
     if (previousEl == null) {
         previousEl = el;
@@ -68,32 +79,37 @@ function showCard(el) {
             errorCard(el);
             errorCard(previousEl);
         }
+        
+        if (el != previousEl) {
+            moveCount += 1;
+        }
         previousEl = null;
-        moveCount += 1;
         document.querySelector('.moves').textContent = moveCount.toString();
         document.querySelector('#move-count').textContent = moveCount.toString();
-        if (moveCount > 20) {
-            stars[0].classList.add('fa-star-o');
-            stars[0].classList.remove('fa-star');           
-        } else if (moveCount > 15) {
+        if (moveCount > 15) {
             stars[1].classList.add('fa-star-o');
-            stars[1].classList.remove('fa-star');
+            stars[1].classList.remove('fa-star');           
         } else if (moveCount > 10) {
             stars[2].classList.add('fa-star-o');
             stars[2].classList.remove('fa-star');
-        }
+        } 
         if (matchCount == 8) {
             document.querySelector('#winModal').classList.remove('hidden');
             document.querySelector('#game').classList.add('hidden');
             document.querySelector('#star-rating').textContent = document.querySelectorAll('.stars .fa-star').length;
+            document.querySelector('#total-time').textContent = document.querySelector('#game-timer').textContent;
+            timer.stop();
         }
     }
 }
+
+/* hides the card's symbol */
 
 function hideCard(el) {
     el.classList.remove('open', 'show', 'error');
 }
 
+/* Incorrect guess. The cards turns red color showing the symbol for seconds  */
 function errorCard(el) {
     el.classList.add('error');
     setTimeout(function() {
@@ -101,6 +117,7 @@ function errorCard(el) {
     }, 100)
 }      
 
+/* Correct guess. If the two cards match, they stay turned over  */
 function matchCard(el) {
     el.classList.add('match');
 }
@@ -109,15 +126,16 @@ function getImageEl(el) {
     return el.querySelector('.fa');
 }
 
+/* This should allow the player to reset the entire grid */
 function restart() {
     previousEl = null;
     matchCount = 0;
     moveCount = 0;
+    timer.stop();
+    document.querySelector('#game-timer').textContent = '';
     document.querySelector('#winModal').classList.add('hidden');
     document.querySelector('#game').classList.remove('hidden');
     document.querySelector('.moves').textContent = moveCount.toString();
-    stars[0].classList.remove('fa-star-o');
-    stars[0].classList.add('fa-star'); 
     stars[1].classList.remove('fa-star-o');
     stars[1].classList.add('fa-star'); 
     stars[2].classList.remove('fa-star-o');
